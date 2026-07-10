@@ -66,11 +66,11 @@
     </div>
 
     <div style="margin-top: 25px;">
-        <img class="summary-img" src="static/fourcomp.jpg" alt="Flux.1 Kontext vs FineForge on four product images">
+        <img class="summary-img" src="static/crossdomain.jpg" alt="Input, Flux.1 Kontext and FineForge on signage and posters">
         <p class="caption">
             Customized generation preserves the subject but destroys its text and logos.
-            <strong>Top:</strong> Flux.1 Kontext. <strong>Bottom:</strong> FineForge.
-            Package copy, nutrition percentages and brand marks survive the re-composition instead of degrading into glyph-shaped texture.
+            Each triplet: <strong>Input</strong> &middot; <strong>FLUX-Kontext</strong> &middot; <strong>Ours</strong>.
+            Trained only on product images, FineForge keeps signage copy and poster typography legible zero-shot.
         </p>
     </div>
 </div>
@@ -270,10 +270,8 @@
     </table>
     </div>
     <p class="note">Trained only on product images. Signage <strong>+4.91 pp</strong> OCR, posters <strong>+6.72 pp</strong>,
-        overall <strong>+5.70 pp</strong>. The learned structural alignment transfers to other text/logo-heavy domains.</p>
-
-    <img class="summary-img" src="static/crossdomain.jpg" style="margin-top:15px;" alt="Cross-domain qualitative comparison">
-    <p class="caption">Cross-domain qualitative comparison on signage and posters.</p>
+        overall <strong>+5.70 pp</strong>. The learned structural alignment transfers to other text/logo-heavy domains.
+        Qualitative examples are shown in the teaser above.</p>
 
     <h4>The margin exceeds proprietary sampling noise</h4>
     <div class="scroll">
@@ -301,7 +299,11 @@
     <h2>Qualitative Results</h2>
     <p>Same reference image, same prompt, same backbone weights before RL. The only difference is the training objective.</p>
 
-    <div class="pairgrid">
+    <img class="summary-img" src="static/fourcomp.jpg" alt="Flux.1 Kontext vs FineForge on four product images">
+    <p class="caption"><strong>Top:</strong> Flux.1 Kontext. <strong>Bottom:</strong> FineForge. Package copy, nutrition percentages
+        and brand marks survive the re-composition instead of degrading into glyph-shaped texture.</p>
+
+    <div class="pairgrid" style="margin-top:22px;">
         <div><img src="static/cmp_756_kontext.jpg" alt="Flux.1 Kontext"><div class="lbl">Flux.1 Kontext</div></div>
         <div><img src="static/cmp_756_ours.jpg" alt="FineForge"><div class="lbl">FineForge</div></div>
     </div>
