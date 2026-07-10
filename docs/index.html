@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>FineForge: Dual-Driven Reinforcement Learning for Fine-Grained Detail Generation in Diffusion Models</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;700&display=swap');
+        body { font-family: "Google Sans", "Open Sans", sans-serif; font-weight: 300; background-color: #fff; margin: 0; padding: 0; }
+        .content { width: 1000px; padding: 25px 50px; margin: 25px auto; background-color: white; box-shadow: 0px 0px 10px #999; border-radius: 15px; }
+        h1 { text-align: center; font-size: 35px; font-weight: 300; }
+        h2 { font-size: 30px; font-weight: 300; text-align: center; }
+        h3 { font-size: 22px; font-weight: 400; text-align: center; color: #444; }
+        h4 { font-size: 18px; font-weight: 400; color: #333; margin: 22px 0 6px; }
+        p { line-height: 25px; text-align: justify; }
+        a, a:visited { color: #224b8d; font-weight: 300; }
+        #authors { text-align: center; margin-bottom: 20px; font-size: 20px; }
+        #authors a { margin: 0 10px; }
+        .summary-img { display: block; margin-left: auto; margin-right: auto; max-width: 100%; }
+        .btn-row { text-align: center; margin-top: 20px; }
+        .btn-row a {
+            display: inline-flex; align-items: center; vertical-align: middle;
+            padding: 6px 18px; margin: 5px; background: #333; color: white;
+            border-radius: 20px; text-decoration: none; font-size: 15px;
+        }
+        .btn-row a:hover { background: #555; color: white; }
+        .btn-row a i { margin-right: 6px; font-size: 18px; }
+        .btn-row a.disabled { background: #888; cursor: not-allowed; pointer-events: none; opacity: 0.7; }
+        table.results { width: 100%; border-collapse: collapse; font-size: 14px; margin: 15px 0; }
+        table.results th { background: #e6e6e6; padding: 8px; text-align: center; }
+        table.results td { padding: 6px 8px; text-align: center; border-bottom: 1px solid #eee; }
+        table.results td:first-child, table.results th:first-child { text-align: left; }
+        table.results tr.ours { background: #d0e8ff; font-weight: 700; }
+        table.results tr.backbone td { border-top: 2px solid #ccc; }
+        .caption { text-align: center; font-size: 14px; color: #666; margin-top: 8px; }
+        .note { font-size: 14px; color: #666; }
+        .tag { display: inline-block; background: #eee; color: #555; border-radius: 12px;
+               padding: 1px 10px; font-size: 12px; vertical-align: middle; margin-left: 6px; }
+        .highlights li { line-height: 26px; margin-bottom: 6px; }
+        .pairgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0; }
+        .pairgrid img { width: 100%; border-radius: 6px; display: block; }
+        .pairgrid .lbl { text-align: center; font-size: 13px; color: #666; margin-top: 5px; }
+        .scroll { overflow-x: auto; }
+        .bibtex-box { background: #f5f5f5; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 13px; overflow-x: auto; white-space: pre; }
+        @media (max-width: 1100px) { .content { width: 90%; padding: 20px; } .pairgrid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="content">
+    <h1><strong>FineForge: Dual-Driven Reinforcement Learning for Fine-Grained Detail Generation in Diffusion Models</strong></h1>
+    <h3 style="margin-top:-8px; color:#b31b1b;"><strong>ACM Multimedia 2026</strong></h3>
+
+    <p id="authors">
+        <a href="#">Heyuan Gao</a>
+        <a href="#">Bangxun Tang</a>
+        <a href="#">Zeyu Gao</a>
+    </p>
+
+    <div class="btn-row">
+        <a href="#" class="disabled"><i class="ai ai-arxiv"></i> Paper</a>
+        <a href="#" class="disabled"><i class="fab fa-github"></i> Code</a>
+        <a href="#" class="disabled"><i class="fas fa-database"></i> Detailbench</a>
+    </div>
+
+    <div style="margin-top: 25px;">
+        <img class="summary-img" src="static/fourcomp.jpg" alt="Flux.1 Kontext vs FineForge on four product images">
+        <p class="caption">
+            Customized generation preserves the subject but destroys its text and logos.
+            <strong>Top:</strong> Flux.1 Kontext. <strong>Bottom:</strong> FineForge.
+            Package copy, nutrition percentages and brand marks survive the re-composition instead of degrading into glyph-shaped texture.
+        </p>
+    </div>
+</div>
+
+<div class="content">
+    <h2>Abstract</h2>
+    <p>
+        Recent advances in customized image generation exhibit strong capabilities in preserving global identity, yet they
+        persistently struggle to synthesize consistent fine-grained details such as text and logos. To bridge this gap, we present
+        <strong>FineForge</strong>, a unified dual-driven reinforcement learning framework designed to explicitly enhance
+        high-frequency structural fidelity within a single denoising trajectory. First, we formulate an
+        <strong>edge-aware terminal reward</strong> that provides an output-level, black-box learning signal for local detail accuracy.
+        Second, to overcome the sparse reward dilemma inherent in standard RL, we introduce
+        <strong>Advantage-Weighted Local Feature Alignment (AW-LFA)</strong>. This white-box regularization module dynamically
+        leverages the terminal reward as a gating mechanism to perform dense, patch-level feature distillation, directly aligning the
+        model's internal hidden states with a pristine semantic space. Evaluated on customized generation benchmarks, FineForge
+        demonstrates substantial improvements in text integrity, logo consistency, and structural sharpness, while preserving
+        coherent global layouts.
+    </p>
+</div>
+
+<div class="content">
+    <h2>Highlights</h2>
+    <ul class="highlights">
+        <li><strong>+33.8% relative OCR accuracy</strong> over the Flux.1 Kontext backbone (0.4400 &rarr; 0.5887), while keeping the
+            <em>same</em> 8&times; VAE compression &mdash; the detail bottleneck is optimization, not the latent space.</li>
+        <li>Best on both Detailbench and DreamBench++, ahead of <strong>Gemini 3 Pro Image</strong>, <strong>Sora</strong> and
+            <strong>Qwen-Image</strong>.</li>
+        <li>The <strong>advantage gate</strong> &mdash; not generic DINO distillation &mdash; is what makes local alignment work.
+            Remove it and AW-LFA collapses back to the GRPO-only baseline.</li>
+        <li>Zero-shot transfer to non-product domains (signage, posters): <strong>+5.70 pp</strong> OCR accuracy.</li>
+        <li>Global quality is preserved: PickScore and Aesthetic Score move by less than 0.3%. No reward hacking of layout.</li>
+    </ul>
+</div>
+
+<div class="content">
+    <h2>Method</h2>
+    <p>
+        FineForge closes a loop between an <em>outcome</em> signal and an <em>internal</em> signal.
+        DIFT coarse-to-fine matching localizes each annotated detail region in the generated image; a Scharr edge pipeline strips
+        away color and lighting so the reward measures structure only; GRPO turns that into a terminal, group-relative advantage.
+        AW-LFA then reuses that same advantage as a <code>ReLU</code> gate: only rollouts that actually got the structure right are
+        allowed to pull the DiT's hidden states toward a frozen DINOv3 feature space.
+    </p>
+
+    <img class="summary-img" src="static/pipeline.png" alt="FineForge reinforcement learning pipeline">
+    <p class="caption">
+        <strong>Reinforcement learning pipeline.</strong> Left: DIFT sliding-window + four-corner matching localizes the detail patch
+        in the generated image. Middle: edge detection (grayscale &rarr; contrast enhancement &rarr; Gaussian denoise &rarr; Scharr
+        operator &rarr; edge filtering). Right: GRPO computes group-relative advantages.
+    </p>
+
+    <img class="summary-img" src="static/awlfa.png" style="margin-top:25px;" alt="Overview of Advantage-Weighted Local Feature Alignment">
+    <p class="caption">
+        <strong>AW-LFA.</strong> The terminal advantage &Acirc;<sub>i</sub> passes through a <code>ReLU</code> gate, so only
+        positive-advantage rollouts contribute the dense patch-level distillation loss. The teacher is a
+        <strong>frozen DINOv3 ViT-B/16</strong> fed an <em>edge map</em>; the student is the DiT's local hidden state at Block 36,
+        projected through a trainable MLP.
+    </p>
+
+    <div style="display:flex; gap:20px; align-items:flex-start; margin-top:25px; flex-wrap:wrap;">
+        <div style="flex:2; min-width:300px;">
+            <img class="summary-img" src="static/edge.jpg" alt="Edge map extracted from a product label">
+            <p class="caption">Why edges: the teacher must describe the <em>structural skeleton</em> &mdash; strokes and logo
+                boundaries &mdash; not surface texture and lighting, which the diffusion objective already supplies for free.</p>
+        </div>
+        <div style="flex:1; min-width:220px;">
+            <img class="summary-img" src="static/reward.jpg" alt="Training reward curve">
+            <p class="caption">Training reward.</p>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <h2>Quantitative Comparison</h2>
+
+    <h4>Detailbench <span class="tag">3,900 product images</span><span class="tag">human-annotated bboxes</span></h4>
+    <div class="scroll">
+    <table class="results">
+        <tr><th>Model</th><th>DINOv2 &uarr;</th><th>DreamSim &darr;</th><th>OCR Acc. &uarr;</th></tr>
+        <tr><td>Sora</td><td>0.8482</td><td>0.1695</td><td>0.4682</td></tr>
+        <tr><td>Gemini 2.5 Flash Image</td><td>0.8468</td><td>0.1922</td><td>0.4122</td></tr>
+        <tr><td>Gemini 3 Pro Image</td><td>0.8824</td><td>0.1638</td><td>0.4736</td></tr>
+        <tr><td>Qwen-Image</td><td>0.8673</td><td>0.1523</td><td>0.4487</td></tr>
+        <tr><td>OmniGen2</td><td>0.8634</td><td>0.1547</td><td>0.4508</td></tr>
+        <tr><td>Xverse</td><td>0.6456</td><td>0.5669</td><td>0.3847</td></tr>
+        <tr class="backbone"><td>Flux.1 Kontext <span class="tag">backbone</span></td><td>0.8702</td><td>0.1585</td><td>0.4400</td></tr>
+        <tr class="ours"><td>FineForge</td><td>0.9016</td><td>0.1076</td><td>0.5887</td></tr>
+    </table>
+    </div>
+    <p class="note">OCR accuracy is computed on human-annotated text crops via PaddleOCR (character-level,
+        Acc = max(0, 1 &minus; d/l)). FineForge beats the strongest proprietary baseline by <strong>11.51 pp</strong> absolute.</p>
+
+    <h4>DreamBench++ <span class="tag">~120 diverse non-product subjects</span></h4>
+    <div class="scroll">
+    <table class="results">
+        <tr><th>Model</th><th>DINOv2 &uarr;</th><th>DreamSim &darr;</th></tr>
+        <tr><td>OmniGen2</td><td>0.7535</td><td>0.4182</td></tr>
+        <tr><td>Qwen-Image</td><td>0.7642</td><td>0.3901</td></tr>
+        <tr><td>Mosaic</td><td>0.7576</td><td>0.4422</td></tr>
+        <tr><td>Xverse</td><td>0.7744</td><td>0.3791</td></tr>
+        <tr><td>Uno</td><td>0.7662</td><td>0.3815</td></tr>
+        <tr><td>Gemini 3 Pro Image</td><td>0.8014</td><td>0.3515</td></tr>
+        <tr class="backbone"><td>Flux.1 Kontext</td><td>0.7939</td><td>0.3612</td></tr>
+        <tr class="ours"><td>FineForge</td><td>0.8178</td><td>0.3179</td></tr>
+    </table>
+    </div>
+    <p class="note">The gain is not a product-domain prior: FineForge also wins on wildlife, vehicles, toys, apparel and
+        decorative objects.</p>
+
+    <h4>Global quality is not sacrificed</h4>
+    <div class="scroll">
+    <table class="results">
+        <tr><th>Model</th><th>Benchmark</th><th>PickScore &uarr;</th><th>Aesthetic &uarr;</th></tr>
+        <tr><td>Flux.1 Kontext</td><td>Detailbench</td><td>0.7745</td><td>5.1855</td></tr>
+        <tr class="ours"><td>FineForge</td><td>Detailbench</td><td>0.7731</td><td>5.1649</td></tr>
+        <tr class="backbone"><td>Flux.1 Kontext</td><td>DreamBench++</td><td>0.7275</td><td>5.7391</td></tr>
+        <tr class="ours"><td>FineForge</td><td>DreamBench++</td><td>0.7269</td><td>5.7690</td></tr>
+    </table>
+    </div>
+    <p class="note">Detail fidelity improves by a wide margin while PickScore and Aesthetic Score move by less than 0.3%.</p>
+</div>
+
+<div class="content">
+    <h2>Ablations</h2>
+
+    <h4>Each component earns its place</h4>
+    <div class="scroll">
+    <table class="results">
+        <tr><th>Variant</th><th>DINOv2 &uarr;</th><th>DreamSim &darr;</th><th>PickScore &uarr;</th><th>Aesthetic &uarr;</th><th>OCR Acc. &uarr;</th></tr>
+        <tr class="ours"><td>FineForge (full)</td><td>0.9016</td><td>0.1076</td><td>0.7731</td><td>5.1649</td><td>0.5887</td></tr>
+        <tr><td>w/o DIFT-localized reward</td><td>0.8846</td><td>0.1169</td><td>0.7568</td><td>5.0336</td><td>0.5491</td></tr>
+        <tr><td>w/o edge detection</td><td>0.8967</td><td>0.1054</td><td>0.7492</td><td>4.9914</td><td>0.5753</td></tr>
+        <tr><td>w/o AW-LFA</td><td>0.8925</td><td>0.1181</td><td>0.7663</td><td>5.0876</td><td>0.5647</td></tr>
+    </table>
+    </div>
+    <p class="note">Dropping edge detection nudges DreamSim down, but the model then gets rewarded for repainting easy background
+        area &mdash; OCR, PickScore and Aesthetic all fall. Edge detection keeps the reward pointed at high-frequency structure.</p>
+
+    <h4>The advantage gate is the contribution</h4>
+    <div class="scroll">
+    <table class="results">
+        <tr><th>Variant</th><th>DINOv2 &uarr;</th><th>DreamSim &darr;</th><th>PickScore &uarr;</th><th>Aesthetic &uarr;</th><th>OCR &uarr;</th></tr>
+        <tr><td>GRPO only (no LFA)</td><td>0.8925</td><td>0.1181</td><td>0.7663</td><td>5.0876</td><td>0.5647</td></tr>
+        <tr><td>+ Uniform LFA (no ReLU gate)</td><td>0.8908</td><td>0.1149</td><td>0.7702</td><td>5.0642</td><td>0.5684</td></tr>
+        <tr><td>+ AW-LFA, RGB-patch teacher</td><td>0.9047</td><td>0.1078</td><td>0.7614</td><td>5.0485</td><td>0.5802</td></tr>
+        <tr class="ours"><td>Full AW-LFA (DINOv3, edge, gated)</td><td>0.9016</td><td>0.1076</td><td>0.7731</td><td>5.1649</td><td>0.5887</td></tr>
+    </table>
+    </div>
+    <p class="note">
+        Remove the ReLU gate and AW-LFA collapses back toward the GRPO-only baseline (OCR 0.5684 vs 0.5647) &mdash; ungated alignment
+        lets conflicting gradients from low-reward rollouts cancel the good ones. Swap the edge teacher for an RGB patch and identity
+        similarity edges up (DINOv2 0.9047) while OCR, PickScore and Aesthetic all drop: the model buys similarity by overfitting
+        background appearance. The improvement is <em>not</em> "add DINOv3 distillation" &mdash; it is the gate.
+    </p>
+
+    <h4>Where to align: AW-LFA depth</h4>
+    <div class="scroll">
+    <table class="results">
+        <tr><th>Alignment depth</th><th>DINOv2 &uarr;</th><th>DreamSim &darr;</th><th>PickScore &uarr;</th><th>Aesthetic &uarr;</th></tr>
+        <tr><td>Block 20 (early)</td><td>0.8970</td><td>0.1112</td><td>0.7690</td><td>5.1250</td></tr>
+        <tr><td>Block 28 (early-mid)</td><td>0.8992</td><td>0.1088</td><td>0.7715</td><td>5.1510</td></tr>
+        <tr class="ours"><td>Block 36 (FineForge)</td><td>0.9016</td><td>0.1076</td><td>0.7731</td><td>5.1649</td></tr>
+        <tr><td>Block 44 (late-mid)</td><td>0.8968</td><td>0.1125</td><td>0.7675</td><td>5.1180</td></tr>
+        <tr><td>Block 52 (late)</td><td>0.8934</td><td>0.1160</td><td>0.7610</td><td>5.0650</td></tr>
+    </table>
+    </div>
+    <p class="note">Block 36 is a Flux-specific empirical choice, not an architectural constant. The transferable rule: align at an
+        intermediate depth where local semantic structure has emerged but features are not yet dominated by late-stage noise prediction.</p>
+</div>
+
+<div class="content">
+    <h2>Generalization &amp; Robustness</h2>
+
+    <h4>Zero-shot transfer to non-product domains</h4>
+    <div class="scroll">
+    <table class="results">
+        <tr>
+            <th rowspan="2">Method</th>
+            <th colspan="3">Signage (n=26)</th>
+            <th colspan="3">Posters (n=20)</th>
+            <th colspan="3">Overall (n=46)</th>
+        </tr>
+        <tr>
+            <th>OCR &uarr;</th><th>DSim &darr;</th><th>DINOv2 &uarr;</th>
+            <th>OCR &uarr;</th><th>DSim &darr;</th><th>DINOv2 &uarr;</th>
+            <th>OCR &uarr;</th><th>DSim &darr;</th><th>DINOv2 &uarr;</th>
+        </tr>
+        <tr><td>Flux.1 Kontext</td>
+            <td>0.7269</td><td>0.1213</td><td>0.8005</td>
+            <td>0.4613</td><td>0.0950</td><td>0.9127</td>
+            <td>0.6114</td><td>0.1099</td><td>0.8493</td></tr>
+        <tr class="ours"><td>FineForge</td>
+            <td>0.7760</td><td>0.0895</td><td>0.8383</td>
+            <td>0.5285</td><td>0.0704</td><td>0.9456</td>
+            <td>0.6684</td><td>0.0812</td><td>0.8849</td></tr>
+    </table>
+    </div>
+    <p class="note">Trained only on product images. Signage <strong>+4.91 pp</strong> OCR, posters <strong>+6.72 pp</strong>,
+        overall <strong>+5.70 pp</strong>. The learned structural alignment transfers to other text/logo-heavy domains.</p>
+
+    <img class="summary-img" src="static/crossdomain.jpg" style="margin-top:15px;" alt="Cross-domain qualitative comparison">
+    <p class="caption">Cross-domain qualitative comparison on signage and posters.</p>
+
+    <h4>The margin exceeds proprietary sampling noise</h4>
+    <div class="scroll">
+    <table class="results">
+        <tr><th>Method</th><th>OCR Acc. &uarr;</th><th>DreamSim &darr;</th><th>DINOv2 &uarr;</th></tr>
+        <tr><td>Sora</td><td>0.4545 &plusmn; 0.0214</td><td>0.1695 &plusmn; 0.0098</td><td>0.8482 &plusmn; 0.0114</td></tr>
+        <tr><td>Gemini 2.5 Flash Image</td><td>0.4122 &plusmn; 0.0195</td><td>0.1922 &plusmn; 0.0264</td><td>0.8468 &plusmn; 0.0221</td></tr>
+        <tr><td>Gemini 3 Pro Image</td><td>0.4621 &plusmn; 0.0118</td><td>0.1638 &plusmn; 0.0062</td><td>0.8824 &plusmn; 0.0092</td></tr>
+        <tr class="ours"><td>FineForge</td><td>0.5887</td><td>0.1076</td><td>0.9016</td></tr>
+    </table>
+    </div>
+    <p class="note">4 independent generations per closed-source baseline (paper-era run + 3 re-runs; Gemini seed &isin; {42, 43, 44};
+        the Sora endpoint exposes no seed, so its 3 re-runs vary the prompt template instead). The largest proprietary OCR std is
+        &plusmn;2.14 pp &mdash; over 5&times; smaller than the 12.66 pp gap from Gemini 3 Pro Image to FineForge.
+        FineForge is a single training run; 3-seed std will be reported in the camera-ready.</p>
+
+    <h4>Human preference</h4>
+    <img class="summary-img" src="static/userstudy.jpg" alt="User study vote share across 8 methods">
+    <p class="caption">Vote share across 8 anonymized methods. FineForge takes the largest share on
+        <strong>Text &amp; Logo Fidelity (21.1%)</strong>, <strong>Subject Identity (18.9%)</strong>, and on
+        <strong>average (18.3%)</strong>.</p>
+</div>
+
+<div class="content">
+    <h2>Qualitative Results</h2>
+    <p>Same reference image, same prompt, same backbone weights before RL. The only difference is the training objective.</p>
+
+    <div class="pairgrid">
+        <div><img src="static/cmp_756_kontext.jpg" alt="Flux.1 Kontext"><div class="lbl">Flux.1 Kontext</div></div>
+        <div><img src="static/cmp_756_ours.jpg" alt="FineForge"><div class="lbl">FineForge</div></div>
+    </div>
+    <div class="pairgrid">
+        <div><img src="static/cmp_219_kontext.jpg" alt="Flux.1 Kontext"><div class="lbl">Flux.1 Kontext</div></div>
+        <div><img src="static/cmp_219_ours.jpg" alt="FineForge"><div class="lbl">FineForge</div></div>
+    </div>
+    <div class="pairgrid">
+        <div><img src="static/cmp_2302_kontext.jpg" alt="Flux.1 Kontext"><div class="lbl">Flux.1 Kontext</div></div>
+        <div><img src="static/cmp_2302_ours.jpg" alt="FineForge"><div class="lbl">FineForge</div></div>
+    </div>
+    <div class="pairgrid">
+        <div><img src="static/cmp_03763_kontext.jpg" alt="Flux.1 Kontext"><div class="lbl">Flux.1 Kontext</div></div>
+        <div><img src="static/cmp_03763_ours.jpg" alt="FineForge"><div class="lbl">FineForge</div></div>
+    </div>
+    <div class="pairgrid">
+        <div><img src="static/cmp_01169_kontext.jpg" alt="Flux.1 Kontext"><div class="lbl">Flux.1 Kontext</div></div>
+        <div><img src="static/cmp_01169_ours.jpg" alt="FineForge"><div class="lbl">FineForge</div></div>
+    </div>
+
+    <h4>Chinese text</h4>
+    <img class="summary-img" src="static/chinese.jpg" alt="Chinese characters reproduced on a product label">
+    <p class="caption">FineForge accurately reproduces Chinese characters on a product label, confirming the approach is not tied to
+        Latin glyph priors.</p>
+</div>
+
+<div class="content">
+    <h2>More Results</h2>
+    <p style="text-align:center;">Each row: <strong>left</strong> reference input, <strong>middle</strong> Flux.1 Kontext,
+        <strong>right</strong> FineForge.</p>
+    <img class="summary-img" src="static/showcase1.jpg" alt="Additional qualitative comparisons, part 1">
+    <p class="caption">Additional qualitative comparisons (Part 1).</p>
+    <img class="summary-img" src="static/showcase2.jpg" style="margin-top:20px;" alt="Additional qualitative comparisons, part 2">
+    <p class="caption">Additional qualitative comparisons (Part 2).</p>
+</div>
+
+<div class="content">
+    <h2>Detailbench</h2>
+    <p>
+        3,900 product images at 1024&times;1024 sourced from Open Food Facts. Prompts generated with Qwen3-VL; annotators manually
+        labelled 3&ndash;5 fine-grained detail regions (text and logos) per image with precise bounding boxes. Evaluation crops come
+        from those human-annotated boxes, so the cropping step contributes <strong>zero</strong> variance.
+    </p>
+    <p>We commit to fully open-sourcing the Detailbench dataset and all training / inference code upon acceptance.</p>
+</div>
+
+<div class="content" style="text-align:center; color:#888; font-size:14px;">
+    All numbers on this page are taken verbatim from the paper, the rebuttal and the supplementary material.
+</div>
+
+</body>
+</html>
